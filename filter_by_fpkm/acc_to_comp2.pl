@@ -102,7 +102,7 @@ sub acc_to_comp {
 	chomp $line2;
 	my @lines2 = split (/\s/, $line2);
 	# get accession names from fasta header stuff
-	my $comp = $lines2[1];
+	my $comp = $lines2[2];
 	$lines2[0] =~ />gnl\|est\|(\S+)/;
 	my $accession = $1;
 	$acc_to_comp{$accession} = $comp;
