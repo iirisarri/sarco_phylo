@@ -8,6 +8,7 @@ use Data::Dumper;
 # modification of comp_to_expression.pl to deal with tab-delimited input that will contain:
 # comp (sp1) \t comp (sp2)
 # where sp1 and sp2 are the species involved in the cross-contamination, and their corresponding rsem files should be given in order
+# option of using a custom format for expression values (from Montpellier)
 
 # comp_to_expression.pl will get different expression values (default fpkm) for pairs of sequences that come from different species but are putative cross-contaminations, and will print ordered value pairs (smaller to larger) in two columns
 
@@ -15,10 +16,12 @@ use Data::Dumper;
 #           (2) output table from rsem for both species
 
 
-my $usage = "comp_to_expression2.pl species.pairs.comp rsem_output_sp1 rsem_out_sp2 > out\n";
+my $usage = "comp_to_expression2.pl species.pairs.comp rsem_output_sp1 rsem_out_sp2 out_sp1 out_sp2\n";
 my $infile = $ARGV[0] or die $usage;
 my $rsem1 = $ARGV[1] or die $usage;
 my $rsem2 = $ARGV[2] or die $usage;
+my $out_sp1 = $ARGV[3] or die $usage;
+my $out_sp2 = $ARGV[4] or die $usage;
 
 
 # get expression values from rsem files (throught the subroutine) and returns a reference of a hash
@@ -39,8 +42,10 @@ my %expression_values_2 = % { $expressions_2 };
 # process infile containing gene pairs
 
 open (IN, "<", $infile) or die "Can't open $infile: $!\n";
-open (OUT1, ">", "cont_to_express_seq_to_remove_species1.out");
-open (OUT2, ">", "cont_to_express_seq_to_remove_species2.out");
+open (OUT1, ">", $out_sp1);
+open (OUT2, ">", $out_sp2);
+#open (OUT1, ">", "cont_to_express_seq_to_remove_species1.out");
+#open (OUT2, ">", "cont_to_express_seq_to_remove_species2.out");
 
 # hash inside of hash to store gene pairs and expression values
 my %expr_value_pairs;
@@ -95,15 +100,17 @@ foreach my $c ( sort keys %expr_value_pairs) {
 	print OUT1 "$1\n";
     }
     elsif ( $contaminant =~ /^second_(.+)/ ) {
-	print OUT2 "$1";
+	print OUT2 "$1\n";
     }
     else {
 	print STDERR "Cannot print out contaminants, unexpected sequence name $contaminant :-(\n";
     }
 }
 
-print "\nLikely contaminants from species 1 printed to cont_to_express_seq_to_remove_species1.out\n";
-print "Likely contaminants from species 2 printed to cont_to_express_seq_to_remove_species2.out\n";
+#print "\nLikely contaminants from species 1 printed to cont_to_express_seq_to_remove_species1.out\n";
+#print "Likely contaminants from species 2 printed to cont_to_express_seq_to_remove_species2.out\n";
+print "\nLikely contaminants from species 1 printed to $out_sp1\n";
+print "Likely contaminants from species 2 printed to $out_sp2\n";
 print "\ndone!\n\n";
 
 ## subroutines ##
