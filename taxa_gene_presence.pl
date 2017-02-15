@@ -4,17 +4,6 @@ use strict;
 use warnings;
 use Data::Dumper;
 
-##########################################################################################
-#
-# #################### Iker Irisarri. Feb 2017. Uppsala University ##################### #
-#
-# Script to summarize presence of taxa in gene alignments.
-#
-# It reads all fasta files in current directory (*.fa) and outputs *.txt files, 
-# One per taxa, including the files in which that taxa is present
-#
-##########################################################################################
-
 my %taxa_infiles;
 
 opendir(DIR, ".") or die "cannot open directory";
@@ -25,29 +14,30 @@ foreach my $infile (@infiles) {
 
     open (IN, "<", $infile) or die "could not open $infile\n";
 
-    while(<IN>){
+    # get gene name
+    #my @name = split ("_", $infile);
+    #my $gene = $name[0];
+    # store genes in order
+    #push ( @genes, $gene);
 
-	# get taxa from current infile
+    while ( my $line =<IN>) {
 
-	while ( my $line =<IN>) {
+	chomp $line;
 
-	    chomp $line;
-
-	    next if ( $line !~ /^>.+/ );
+	next if ( $line !~ /^>.+/ );
 	    
-	    if ( !exists $taxa_infiles{$line} ) {
+	if ( !exists $taxa_infiles{$line} ) {
 
-		$taxa_infiles{$line} = [$infile];
-	    }
-	    else {
-
-		my @array = @{ $taxa_infiles{$line} };
-
-                push ( @array , $infile);
-
-                $taxa_infiles{$line} = [@array];
-	    }
+	    $taxa_infiles{$line} = [$infile];
 	}
+        else {
+
+	    my @array = @{ $taxa_infiles{$line} };
+
+            push ( @array , $infile);
+
+            $taxa_infiles{$line} = [@array];
+      	}
     }
 }
 
